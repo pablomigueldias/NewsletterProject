@@ -1,73 +1,93 @@
-# React + TypeScript + Vite
+# 🚀 Newsletter Portfolio (Serverless Integration)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a Full-Stack implementation of a lead capture system, demonstrating secure architecture and modern web development practices.
 
-Currently, two official plugins are available:
+🔗 **Demo:** [Vercel](https://newsletter-project-ten.vercel.app/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Tech Stack & Architecture
 
-## React Compiler
+* **Frontend:** React 19, TypeScript, Vite, Tailwind CSS v4.
+* **Backend:** Node.js (Vercel Serverless Functions).
+* **Integration:** Mailchimp Marketing API.
+* **Validation:** Zod (Schema Validation) on Front and Back.
+* **DevOps:** CI/CD via Vercel, Docker (Environment Consistency).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🔄 Application Flow (Sequence Diagram)
 
-## Expanding the ESLint configuration
+The diagram below illustrates the **BFF (Backend for Frontend)** pattern used to protect API credentials:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant F as Frontend (React/Vite)
+    participant S as Vercel Serverless (Node.js)
+    participant M as Mailchimp API
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+    U->>F: Enters Email and Clicks "Subscribe"
+    F->>F: Validates email format (Zod/Regex)
+    
+    alt Invalid Email
+        F-->>U: Shows visual error
+    else Valid Email
+        F->>S: POST /api/subscribe { email }
+        Note right of F: No API Key here!
+        
+        S->>S: Retrieves MAILCHIMP_API_KEY (Env Var)
+        S->>M: POST /lists/{id}/members
+        
+        alt Mailchimp Success
+            M-->>S: 200 OK (Created)
+            S-->>F: 200 OK
+            F-->>U: Toast "Subscription successful!"
+        else Error (Exists/Invalid)
+            M-->>S: 400 Bad Request
+            S-->>F: 400 Bad Request
+            F-->>U: Toast "Error: Email already registered or invalid."
+        end
+    end
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Architectural Decisions
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### API Key Security (BFF Pattern)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Instead of calling the Mailchimp API directly from the Frontend (which would expose credentials in the client's browser), I chose to use Serverless Functions as a secure middleware.
+
+- Flow: Client -> Next.js API (Validation + Auth) -> Mailchimp.
+
+- This ensures the MAILCHIMP_API_KEY never leaves the secure server environment.
+
+### Double Validation (Zod)
+
+Data integrity is guaranteed in two layers:
+
+- Client-side: Instant visual feedback for the user.
+
+- Server-side: Protection against malicious requests (frontend bypass).
+
+### Tailwind CSS v4
+
+Adoption of the latest version (v4) for optimized performance via Lightning CSS and reduced build time.
+
+## How to Run Locally
+
+- Node.js 20+
+- Mailchimp Account (API Key and Audience ID)
+
+### Installation
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-username/newsletter-portfolio.git
+
+# 2. Install dependencies
+npm install
+
+# 3. Configure Environment Variables (.env)
+cp .env.example .env
+# Fill in: MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID, MAILCHIMP_DATACENTER
+
+# 4. Run the development server
+npm run dev
+
 ```
