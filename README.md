@@ -1,10 +1,10 @@
-# 🚀 Newsletter Portfolio (Serverless Integration)
+# Newsletter Portfolio (Serverless Integration)
 
 This project is a Full-Stack implementation of a lead capture system, demonstrating secure architecture and modern web development practices.
 
 🔗 **Demo:** [Vercel](https://newsletter-project-ten.vercel.app/)
 
-## 🛠️ Tech Stack & Architecture
+## Tech Stack & Architecture
 
 * **Frontend:** React 19, TypeScript, Vite, Tailwind CSS v4.
 * **Backend:** Node.js (Vercel Serverless Functions).
@@ -12,7 +12,7 @@ This project is a Full-Stack implementation of a lead capture system, demonstrat
 * **Validation:** Zod (Schema Validation) on Front and Back.
 * **DevOps:** CI/CD via Vercel, Docker (Environment Consistency).
 
-## 🔄 Application Flow (Sequence Diagram)
+## Application Flow (Sequence Diagram)
 
 The diagram below illustrates the **BFF (Backend for Frontend)** pattern used to protect API credentials:
 
