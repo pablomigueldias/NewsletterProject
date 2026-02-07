@@ -1,4 +1,4 @@
-# Newsletter Portfolio (Serverless Integration)
+# Newsletter
 
 This project is a Full-Stack implementation of a lead capture system, demonstrating secure architecture and modern web development practices.
 
