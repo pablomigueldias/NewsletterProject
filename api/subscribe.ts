@@ -55,7 +55,7 @@ export default async function handler(
     }
 
     if (error instanceof z.ZodError) {
-      return response.status(400).json({ error: error.errors[0].message });
+        return response.status(400).json({ error: error.issues[0].message });
     }
 
     console.error('Server Error:', error);
